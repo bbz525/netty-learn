@@ -1,4 +1,4 @@
-package cpm.poplar.hello;
+package com.poplar.hello;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

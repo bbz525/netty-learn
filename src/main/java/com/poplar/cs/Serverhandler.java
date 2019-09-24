@@ -1,4 +1,4 @@
-package cpm.poplar.cs;
+package com.poplar.cs;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

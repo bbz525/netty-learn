@@ -1,4 +1,4 @@
-package cpm.poplar.hello;
+package com.poplar.hello;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

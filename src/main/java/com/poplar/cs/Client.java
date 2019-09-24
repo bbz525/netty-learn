@@ -1,4 +1,4 @@
-package cpm.poplar.cs;
+package com.poplar.cs;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;

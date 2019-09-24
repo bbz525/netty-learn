@@ -1,4 +1,4 @@
-package cpm.poplar.cs;
+package com.poplar.cs;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -10,9 +10,9 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
 /**
- * Created By poplar on 2019/9/24
+ * Created By poplar on 2019/9/23
  */
-public class ClientInitializer extends ChannelInitializer<SocketChannel> {
+public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
@@ -21,7 +21,6 @@ public class ClientInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new LengthFieldPrepender(4));
         pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
         pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
-        pipeline.addLast(new ClientHandler());
-
+        pipeline.addLast(new Serverhandler());
     }
 }
