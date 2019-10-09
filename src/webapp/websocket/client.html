@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket客服端</title>
+</head>
+<body>
+<script type="text/javascript">
+    var socket
+    //判断浏览器是否支持websocket
+    if (window.WebSocket) {
+        socket = new WebSocket("ws://localhost:9001/ws")
+
+        //当收到服务端消息的时候
+        socket.onmessage = function (ev) {
+            var data = document.getElementById("messageResponse")
+            data.value = data.value + "\n" + ev.data
+        }
+        //当服务器打开的时候
+        socket.onopen = function (ev) {
+            var data = document.getElementById("messageResponse")
+            data.value = "链接开启。。。。"
+        }
+        //当服务器关闭的时候
+        socket.onclose = function (ev) {
+            var data = document.getElementById("messageResponse")
+            data.value = data.value + "\n" + "链接关闭。。。"
+        }
+    } else {
+        alert("你的浏览器版本较低，不支持websocket!")
+    }
+
+    function send(message) {
+        if (!window.WebSocket) {
+            return
+        } else {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(message)
+            } else {
+                alert("服务器还未开启。。。。")
+            }
+        }
+
+    }
+
+</script>
+<form onsubmit="return false;">
+    <textarea id="message" style="width: 300px;height: 300px;"></textarea>
+    <input type="button" onclick="send(document.getElementById('message').value)" value="发送消息">
+    <hr>
+    <h2>客服端收到来自服务器的消息</h2>
+    <textarea id="messageResponse" style="width: 300px;height: 300px;"></textarea>
+</form>
+</body>
+</html>
