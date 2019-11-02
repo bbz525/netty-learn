@@ -1,4 +1,5 @@
 # Netty源码解读
+- Netty架构原理参考：https://www.cnblogs.com/winner-0715/p/8733787.html
 - 从HTTP说起有了Netty，你可以实现自己的HTTP服务器，FTP服务器，UDP服务器，RPC服务器，WebSocket服务器，Redis的Proxy服务器，MySQL的Proxy服务器等等。我们回顾一下传统的HTTP服务器的原理
 1. 创建一个ServerSocket，监听并绑定一个端口 
 2. 一系列客户端来请求这个端口 
