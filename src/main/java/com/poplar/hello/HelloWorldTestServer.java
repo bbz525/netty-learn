@@ -14,12 +14,18 @@ public class HelloWorldTestServer {
 
     public static void main(String[] args) {
         //创建两个线程循环工作组,一个用于接收请求,一个用于处理请求
+        /**
+         * public NioEventLoopGroup() {
+         *         this(0);
+         *     }
+         */
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workGroup = new NioEventLoopGroup();
 
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workGroup).channel(NioServerSocketChannel.class).childHandler(new HelloWorldChannelInitializer());
+            /*前面的都是再做一些准备工作，调用bind才真正的创建实列*/
             ChannelFuture channelFuture = bootstrap.bind(8080).sync();
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
