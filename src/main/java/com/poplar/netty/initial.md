@@ -107,41 +107,35 @@ public interface Future<V> {
 
 ### `io.netty.channel.ChannelFuture`类
 ```java
-/*
- * The result of an asynchronous {@link Channel} I/O operation.
- * 
- * All I/O operations in Netty are asynchronous.  It means any I/O calls will
- * return immediately with no guarantee that the requested I/O operation has
- * been completed at the end of the call.  Instead, you will be returned with
- * a {@link ChannelFuture} instance which gives you the information about the
- * result or status of the I/O operation.
- * 
- * A {@link ChannelFuture} is either <em>uncompleted</em> or <em>completed</em>.
- * When an I/O operation begins, a new future object is created.  The new future
- * is uncompleted initially - it is neither succeeded, failed, nor cancelled
- * because the I/O operation is not finished yet.  If the I/O operation is
- * finished either successfully, with failure, or by cancellation, the future is
- * marked as completed with more specific information, such as the cause of the
- * failure.  Please note that even failure and cancellation belong to the
- * completed state.
- * 
- *  不同的状态下各个方法返回的结果
- *                                      +---------------------------+
- *                                      | Completed successfully    |
- *                                      +---------------------------+
- *                                 +---->      isDone() = true      |
- * +--------------------------+    |    |   isSuccess() = true      |
- * |        Uncompleted       |    |    +===========================+
- * +--------------------------+    |    | Completed with failure    |
- * |      isDone() = false    |    |    +---------------------------+
- * |   isSuccess() = false    |----+---->      isDone() = true      |
- * | isCancelled() = false    |    |    |       cause() = non-null  |
- * |       cause() = null     |    |    +===========================+
- * +--------------------------+    |    | Completed by cancellation |
- *                                 |    +---------------------------+
- *                                 +---->      isDone() = true      |
- *                                      | isCancelled() = true      |
- *                                      +---------------------------+
- * </pre>
- */
+    The result of an asynchronous Channel I/O operation.
+    All I/O operations in Netty are asynchronous. It means any I/O calls will
+    return immediately with no guarantee that the requested I/O operation has been completed at the end of the call. Instead,
+    you will be returned with a ChannelFuture instance which gives you the information about the result or status of the I/O operation.
+    A ChannelFuture is either uncompleted or completed. When an I/O operation begins, a new future object is created. 
+    The new future is uncompleted initially - it is neither succeeded, failed, nor cancelled because the I/O operation is not finished yet. 
+    If the I/O operation is finished either successfully, with failure, or by cancellation,
+    the future is marked as completed with more specific information,
+    such as the cause of the failure. Please note that even failure and cancellation belong to the completed state.
+
+                                        +---------------------------+
+                                        | Completed successfully    |
+                                        +---------------------------+
+                                   +---->      isDone() = true      |
+   +--------------------------+    |    |   isSuccess() = true      |
+   |        Uncompleted       |    |    +===========================+
+   +--------------------------+    |    | Completed with failure    |
+   |      isDone() = false    |    |    +---------------------------+
+   |   isSuccess() = false    |----+---->      isDone() = true      |
+   | isCancelled() = false    |    |    |       cause() = non-null  |
+   |       cause() = null     |    |    +===========================+
+   +--------------------------+    |    | Completed by cancellation |
+                                   |    +---------------------------+
+                                   +---->      isDone() = true      |
+                                        | isCancelled() = true      |
+                                        +---------------------------+
+   
 ```
+### 注意：
+ - JDR所提供的Future只能通过手工方式检查执行结果,而这个操作是会阻塞的; Netty则对channel Future进行了端强,
+ 通过channelFutureListener以回调的方式来获取执行结果,去除了手工检查阻塞的操作;
+ 值得注意的是: channelFutureListener的operationComplete方法是由I/O执行的,因此阻塞的操作不要在这里执行耗时的操作,否则需要通过另外的程或线程池来执行.

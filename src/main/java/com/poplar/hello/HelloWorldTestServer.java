@@ -25,12 +25,15 @@ public class HelloWorldTestServer {
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workGroup).channel(NioServerSocketChannel.class).childHandler(new HelloWorldChannelInitializer());
-            /*前面的都是再做一些准备工作，调用bind才真正的创建实列*/
+            /*前面的都是再做一些准备工作，调用bind才真正的创建实列
+            * 通过调用同步方法sync()方法确保整个初始化和注册真正的完成
+            * */
             ChannelFuture channelFuture = bootstrap.bind(8080).sync();
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            //表示优雅关闭，表示关闭Channel和清楚服务端的资源
             bossGroup.shutdownGracefully();
             workGroup.shutdownGracefully();
         }

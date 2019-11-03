@@ -125,3 +125,78 @@ public interface Executor {
 - NioEventLoopGroup类关系
 
 ![NioEventLoopGroup类关系](./images/NioEventLoopGroup.png)
+
+### 关于ChannelHandlerContext.attr(..) 和 Channel.attr(..)的作用域问题
+
+  - 参考链接：https://netty.io/wiki/new-and-noteworthy-in-4.1.html
+  
+ ```java
+ChannelHandlerContext.attr(..) == Channel.attr(..)
+Both Channel and ChannelHandlerContext implement the interface AttributeMap to enable a user to attach one or more user-defined attributes to them. 
+What sometimes made a user confused was that a Channel and a ChannelHandlerContext had its own storage for the user-defined attributes.
+For example, even if you put an attribute 'KEY_X' via Channel.attr(KEY_X).set(valueX),
+you will never find it via ChannelHandlerContext.attr(KEY_X).get() and vice versa. This behavior is not only confusing but also is waste of memory.
+  
+To address this issue, we decided to keep only one map per Channel internally. AttributeMap always uses AttributeKey as its key.
+ AttributeKey ensures uniqueness between each key, and thus there's no point of having more than one attribute map per Channel.
+  As long as a user defines its own AttributeKey as a private static final field of his or her ChannelHandler, there will be no risk of duplicate keys.
+```
+- 源码中的方法
+```java
+ @Override
+    public <T> Attribute<T> attr(AttributeKey<T> key) {
+        return channel().attr(key);
+    }
+```
+### 服务注册
+```java
+
+        @Override
+        public final void register(EventLoop eventLoop, final ChannelPromise promise) {
+            ...
+            AbstractChannel.this.eventLoop = eventLoop;
+            //此处是netty对于线程和并发的控制
+            if (eventLoop.inEventLoop()) { //此处判断当前线程是否是EvenLoop中所包含的那个线程
+                register0(promise);
+            } else {
+                try {
+                    eventLoop.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            register0(promise);
+                        }
+                    });
+                }
+        }
+    //最终执行注册的方法
+    @Override
+    protected void doRegister() throws Exception {
+        ...
+        for (;;) {
+            try {
+                //调用Nio底层完成注册 eventLoop().unwrappedSelector() 返回Selector
+                selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), 0, this);
+                return;
+            }
+            }
+            ...
+    }
+
+```
+# 注意：
+1. 一个eventLoopGroup当中会包含一个或多个eventLoop;
+2. 一个EventLoop在它的整个生命周期当中都只会与唯一一个Thread进行绑定;
+3. 所有由EventLoop所处理的各种I/O事件都将在它所关联的那个Thread上进行处理;
+4. 一个channel在它的整个生命周期中只会注册在一个eventLoop;
+5. 一个eventLoop在运行过程当中,会被分配给一个或者多个channel，所以在ChannelHandler中一定不要做非常耗时的操作.
+
+- 重要结论: 在Netty中, Channel的实现一定是线程安全的:若于此,我们可以存储一个channel的引用,并且在需要向远程端点发送数据时,
+通过这个引用来调用channel相应的方法;即便当时有很多线程都在使用它也不会出现多线程问题;而且,消息一定会按照顺序发送出去.
+- 重要结论:我们在业务开发中,不要将长时间执行的耗时任务放入别eventLoop的执行队列中,因为它将会一直阻塞该线程所对应的所有Channel上的其他执行任务,
+如果我们需要进行阻塞调用或是耗时的操作(实际开发中很常见) ,那么我们就需要使用一个专门的eventExecutor (业务战程池)
+
+- 通常会有两种实现方式:
+1. 在ChannelHandler的回调方法中,使用自己定义的业务线程池,这样就可以实现异步调用.
+2. 借助Netty提供的向 ChannelPipeLine 添加ChannelHandler时调用addLast()方法来传递eventExecutor
+说明:默认情况下调用addLast(handler) , ChannelHandler中的回调方法都是由I/O程所执行,如果调用ChannelPipeline
+addLast(EventExecutorGroup group, String name, ChannelHandler handler)方法,那么ChannelHandler中的回调方法款是由参数中的group来执行的。

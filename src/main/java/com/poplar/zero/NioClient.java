@@ -27,7 +27,9 @@ public class NioClient {
          * operating systems can transfer bytes directly from the filesystem cache
          * to the target channel without actually copying them.
          * */
-        long len = fileChannel.transferTo(0, fileChannel.size(), socketChannel);
+        long len;
+        long count=0;
+        len = fileChannel.transferTo(0, fileChannel.size(), socketChannel);
         System.out.println("发送总字节数：" + len + "  总耗时" + (System.currentTimeMillis() - startTime));
         fileChannel.close();
     }
