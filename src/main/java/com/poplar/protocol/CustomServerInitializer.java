@@ -5,7 +5,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 
 /**
- * Created By poplar on 2019/9/26
+ * Created By poplar
+ * 服务端 Initializer，主要用于批量注册处理器，之后会被remove掉
  */
 public class CustomServerInitializer extends ChannelInitializer<SocketChannel> {
 

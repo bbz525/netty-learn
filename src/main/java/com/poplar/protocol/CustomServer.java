@@ -7,7 +7,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
- * Created By poplar on 2019/9/26
+ * Created By poplar
+ * 服务端初始化及注册
  */
 public class CustomServer {
 

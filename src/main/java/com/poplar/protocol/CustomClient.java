@@ -8,7 +8,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
  * Created By poplar on 2019/9/24
- * 自定义编解码器
+ * 自定义编解码器客服端初始化及注册
  */
 public class CustomClient {
     public static void main(String[] args) {
