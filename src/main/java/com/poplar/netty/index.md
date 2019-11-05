@@ -200,3 +200,13 @@ To address this issue, we decided to keep only one map per Channel internally. A
 2. 借助Netty提供的向 ChannelPipeLine 添加ChannelHandler时调用addLast()方法来传递eventExecutor
 说明:默认情况下调用addLast(handler) , ChannelHandler中的回调方法都是由I/O程所执行,如果调用ChannelPipeline
 addLast(EventExecutorGroup group, String name, ChannelHandler handler)方法,那么ChannelHandler中的回调方法款是由参数中的group来执行的。
+
+### NettyNio和OIO两种编程模型图
+
+- Nio中一个线程对应多个Channel，OIO中一个线程只对应一个Channel
+
+![NettyNio和OIO两种编程模型图](./images/nioandoio.png)
+
+- 解决C S/C S 这种情况的编码
+
+![解决C S/C S 这种情况的编码](./images/css.png)
